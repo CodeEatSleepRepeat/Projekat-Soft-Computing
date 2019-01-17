@@ -3,6 +3,8 @@ Project for Soft Computing (BSc of Electrical Engineering and Computer Science, 
 
 The aim of the project is to determine whether a person is drug-dependent or not based on a face line. 
 Using a smart algorithm, I will extract facial lines and use them for KNN and SVM for classification. Then I will compare this algorithm with the classic HOG + KNN and HOG + SVM algorithms.
+
+Detailed project specification can be found [here](https://github.com/ftn-ai-lab/sc-2018-e2/issues/31)
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
