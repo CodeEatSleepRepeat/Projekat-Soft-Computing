@@ -48,6 +48,6 @@ Thanks *Ivan Perić* - [ivan7792](https://github.com/ivan7792) for tips and tric
 
 ## License
 
-This project is licensed under the GNU General Public License - see the [LICENSE](LICENSE) file for details
-This project is free to use in academic and learning purposes, no need for Authors permision.
-If it's for commercial project or any other money making project contact Authors for written permision.
+This project is licensed under the GNU General Public License - see the [LICENSE](LICENSE) file for details.
+Project is free to use in academic and learning purposes without the Authors permision.
+If project or its parts are used for commercial project or any other money making project contact Authors for written permision.
