@@ -193,12 +193,12 @@ def average(l):
 verbosity=False
 
 image_list = {}
-list_eye_color = []
-list_skin_color = []
-list_hair_color = []
-list_wrinkles = []
-list_symmerty = []
-list_golden_ratio = []
+list_wrinkles_pos = []
+list_wrinkles_neg = []
+list_symmetry_pos = []
+list_symmetry_neg = []
+list_golden_ratio_pos = []
+list_golden_ratio_neg = []
 
 pos_features = []
 neg_features = []
@@ -237,6 +237,7 @@ predictor = dlib.shape_predictor(p)
 
 for name in image_list:
     image = image_list[name]
+    img_type = name.split("_", 1)[0]
     original = image.copy()
     features = []
     if verbosity==True:
@@ -265,25 +266,39 @@ for name in image_list:
     err = symmetry_deviation(shape)
     if verbosity==True:
         print('Deviation from the Symmetry is ' + str(err) + '° (less is better, ideally 0)')
-    list_symmerty.append(err)
+    
+    if (img_type=="pos"):
+        list_symmetry_pos.append(err)
+    else:
+        list_symmetry_neg.append(err)
+    
     features.append(err)
 
 	# Algorithm 5: Golden ratio
     err = golden_ratio(shape)
     if verbosity==True:
         print('The deviation from the Golden Ratio is ' + str(err) + ' (less is better, ideally 1)')
-    list_golden_ratio.append(err)
+    
+    if (img_type=="pos"):
+        list_golden_ratio_pos.append(err)
+    else:
+        list_golden_ratio_neg.append(err)
+        
     features.append(err)
  
     # Algorithm 6: Skin wrinkles
     wrinkles_number = skin_wrinkles(shape,original)
     if verbosity==True:
         print('The percentage of wrinkles is ' + str(wrinkles_number) + ' (less is better, ideally 0)')
-    list_wrinkles.append(wrinkles_number)
+    
+    if (img_type=="pos"):
+        list_wrinkles_pos.append(wrinkles_number)
+    else:
+        list_wrinkles_neg.append(wrinkles_number)
+    
     features.append(wrinkles_number)
     
-    # Algorithm 7: Preparation for classification
-    img_type = name.split("_", 1)[0]
+    # Algorithm 7: Preparation for classification    
     if (img_type=="pos"):
         pos_features.append(features)
         labels.append(1)
@@ -292,10 +307,15 @@ for name in image_list:
         labels.append(0)
     
 
-print('\nThe results:')
-print('The average deviation from the Symmetry is     ' + str(average(list_symmerty)) + '° (less is better, ideally 0)')
-print('The average deviation from the Golden Ratio is ' + str(average(list_golden_ratio)) + ' (less is better, ideally 1)')
-print('The average percentage of wrinkles is          ' + str(average(list_wrinkles)) + '% (less is better, ideally 0)')
+print('\nThe results')
+print('\nDrug-dependent person:')
+print('The average deviation from the Symmetry is     ' + str(average(list_symmetry_pos)) + '° (less is better, ideally 0)')
+print('The average deviation from the Golden Ratio is ' + str(average(list_golden_ratio_pos)) + ' (less is better, ideally 1)')
+print('The average percentage of wrinkles is          ' + str(average(list_wrinkles_pos)) + '% (less is better, ideally 0)')
+print('\nNon-drug-dependent person:')
+print('The average deviation from the Symmetry is     ' + str(average(list_symmetry_neg)) + '° (less is better, ideally 0)')
+print('The average deviation from the Golden Ratio is ' + str(average(list_golden_ratio_neg)) + ' (less is better, ideally 1)')
+print('The average percentage of wrinkles is          ' + str(average(list_wrinkles_neg)) + '% (less is better, ideally 0)')
 
 
 # Algorithm 7: Preparation for classification
@@ -311,7 +331,7 @@ svm = SVC(kernel='linear', probability=True)
 svm.fit(x_train, y_train)
 y_train_pred = svm.predict(x_train)
 y_test_pred = svm.predict(x_test)
-print("SVM Train accuracy: ", accuracy_score(y_train, y_train_pred))
+print("\nSVM Train accuracy: ", accuracy_score(y_train, y_train_pred))
 print("SVM Validation accuracy: ", accuracy_score(y_test, y_test_pred))
 
 # Algorithm 9: KNN classification
