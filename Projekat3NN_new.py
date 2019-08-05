@@ -2,6 +2,7 @@ import os
 import cv2
 import math
 import dlib
+import PIL
 import operator
 import datetime
 import itertools
@@ -13,6 +14,11 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
+from keras.layers import MaxPooling1D
+from keras.models import Sequential
+from keras.layers import Conv1D
+from keras.layers import Flatten
+from keras.layers import Dense
 from colorthief import ColorThief
 from imutils import face_utils
 from sklearn.svm import SVC
@@ -213,8 +219,11 @@ def average(l):
     
 # Declaration of variables
 verbosity=False
+basewidth=320
 
 image_list = {}
+temp_list = {}
+
 pos_list_redness = []
 pos_list_wrinkles = []
 pos_list_symmerty = []
@@ -249,10 +258,13 @@ for img_name in os.listdir(image_dir_neg):
     image_list[img_name]=img
 
 # Algorithm 2: Image preprocessing
-#for img in image_list:
-#    image_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-#    temp_list.append(image_hsv)
-
+#for img_name in image_list:
+#	img = image_list[img_name]
+#	wpercent = (basewidth / float(img.shape[0]))
+#	hsize = int((float(img.shape[1]) * float(wpercent)))
+#	img = cv2.resize(img, (basewidth, hsize), PIL.Image.ANTIALIAS)
+#	temp_list[img_name]=img
+#
 #image_list = temp_list
 
 p = "shape_predictor_68_face_landmarks.dat"
@@ -341,6 +353,7 @@ print('The average percentage of wrinkles is          ' + str(average(pos_list_w
 print('The average percentage of redness is           ' + str(average(pos_list_redness)) + '% (less is better, ideally 0)')
 
 
+
 # Algorithm 8: Preparation for classification
 pos_features = np.array(pos_features)
 neg_features = np.array(neg_features)
@@ -349,24 +362,57 @@ y = np.array(labels)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
+end_prep_time = datetime.datetime.utcnow()
+
 #  Algorithm 9: SVM classification
+start_svm_time = datetime.datetime.utcnow()
 svm = SVC(kernel='linear', probability=True) 
 svm.fit(x_train, y_train)
 y_train_pred = svm.predict(x_train)
 y_test_pred = svm.predict(x_test)
 print("\nSVM Train accuracy: ", accuracy_score(y_train, y_train_pred))
 print("SVM Validation accuracy: ", accuracy_score(y_test, y_test_pred))
+end_svm_time = datetime.datetime.utcnow()
 
 # Algorithm 10: KNN classification
-knn = KNeighborsClassifier(n_neighbors=10)
+knn = KNeighborsClassifier(n_neighbors=3)
 knn = knn.fit(x_train, y_train)
 y_train_pred = knn.predict(x_train)
 y_test_pred = knn.predict(x_test)
 print("\nKNN Train accuracy: ", accuracy_score(y_train, y_train_pred))
 print("KNN Validation accuracy: ", accuracy_score(y_test, y_test_pred))
+end_knn_time = datetime.datetime.utcnow()
+
+
+# Algorithm 11: CNN classification
+classifier = Sequential()
+n_cols = x_train.shape[1]
+
+classifier.add(Conv1D(32, 2, input_shape=(n_cols,1), activation = 'relu'))
+classifier.add(MaxPooling1D(2))
+classifier.add(Conv1D(32, 1, activation = 'relu'))
+classifier.add(MaxPooling1D(1))
+
+classifier.add(Flatten())
+
+classifier.add(Dense(units = 128, activation = 'relu'))
+classifier.add(Dense(units = 1, activation = 'sigmoid'))
+
+classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+classifier.fit(np.expand_dims(x_train, axis=2), y_train, validation_split=0.2, steps_per_epoch = 8000, epochs = 30, validation_steps = 2000)
+
+y_train_pred = model.predict(x_train)
+y_test_pred = model.predict(x_test)
+print("\nCNN Train accuracy: ", accuracy_score(y_train, y_train_pred))
+print("CNN Validation accuracy: ", accuracy_score(y_test, y_test_pred))
 
 
 end_time = datetime.datetime.utcnow()
 print('\nProcess ended at ', end_time)
-print('The process lasted ', end_time-start_time) 
+print('The process lasted ', end_time-start_time)
+
+print('\nThe preparation of images lasted ', end_prep_time-start_time)
+print('The SVM classification of images lasted ', end_svm_time-start_svm_time)
+print('The KNN classification of images lasted ', end_knn_time-end_svm_time)
+print('The CNN classification of images lasted ', end_time-end_knn_time)
 

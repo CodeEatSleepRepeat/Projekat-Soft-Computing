@@ -12,6 +12,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
+from keras.callbacks import EarlyStopping
+from keras.models import Sequential
+from keras.layers import Dense
 from sklearn.svm import SVC
 
 # Declaration of functions
@@ -84,23 +87,57 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 x_train = reshape_data(x_train)
 x_test = reshape_data(x_test)
 
+end_prep_time = datetime.datetime.utcnow()
+
 # Algorithm 4: SVM classification
+start_svm_time = datetime.datetime.utcnow()
 svm = SVC(kernel='linear', probability=True) 
 svm.fit(x_train, y_train)
 y_train_pred = svm.predict(x_train)
 y_test_pred = svm.predict(x_test)
-print("SVM Train accuracy: ", accuracy_score(y_train, y_train_pred))
+print("\nSVM Train accuracy: ", accuracy_score(y_train, y_train_pred))
 print("SVM Validation accuracy: ", accuracy_score(y_test, y_test_pred))
+end_svm_time = datetime.datetime.utcnow()
+
 
 # Algorithm 5: KNN classification
-knn = KNeighborsClassifier(n_neighbors=10)
+knn = KNeighborsClassifier(n_neighbors=3)
 knn = knn.fit(x_train, y_train)
 y_train_pred = knn.predict(x_train)
 y_test_pred = knn.predict(x_test)
-print("KNN Train accuracy: ", accuracy_score(y_train, y_train_pred))
+print("\nKNN Train accuracy: ", accuracy_score(y_train, y_train_pred))
 print("KNN Validation accuracy: ", accuracy_score(y_test, y_test_pred))
+end_knn_time = datetime.datetime.utcnow()
+
+# Algorithm 6: Deep learning
+model = Sequential()
+n_cols = x_train.shape[1]
+
+model.add(Dense(250, activation='relu', input_shape=(n_cols,)))
+model.add(Dense(250, activation='relu'))
+model.add(Dense(500, activation='relu'))
+model.add(Dense(500, activation='relu'))
+model.add(Dense(250, activation='relu'))
+model.add(Dense(1, activation='softmax'))
+
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
+
+early_stopping_monitor = EarlyStopping(patience=3)
+model.fit(x_train, y_train, validation_split=0.2, epochs=30, callbacks=[early_stopping_monitor])
+
+y_train_pred = model.predict(x_train)
+y_test_pred = model.predict(x_test)
+print("\nDeep learning Train accuracy: ", accuracy_score(y_train, y_train_pred))
+print("Deep learning Validation accuracy: ", accuracy_score(y_test, y_test_pred))
+
 
 end_time = datetime.datetime.utcnow()
 print('\nProcess ended at ', end_time)
-print('The process lasted ', end_time-start_time) 
+print('The process lasted ', end_time-start_time)
+
+print('\nThe preparation of images lasted ', end_prep_time-start_time)
+print('The SVM classification of images lasted ', end_svm_time-start_svm_time)
+print('The KNN classification of images lasted ', end_knn_time-end_svm_time)
+print('Deep learning classification of images lasted ', end_time-end_knn_time)
+
 
