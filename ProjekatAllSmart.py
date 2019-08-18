@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
-from colorthief import ColorThief
 from imutils import face_utils
 from sklearn.svm import SVC
 

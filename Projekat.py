@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
-from colorthief import ColorThief
 from imutils import face_utils
 from sklearn.svm import SVC
 
@@ -358,7 +357,7 @@ print("\nSVM Train accuracy: ", accuracy_score(y_train, y_train_pred))
 print("SVM Validation accuracy: ", accuracy_score(y_test, y_test_pred))
 
 # Algorithm 10: KNN classification
-knn = KNeighborsClassifier(n_neighbors=10)
+knn = KNeighborsClassifier(n_neighbors=3)
 knn = knn.fit(x_train, y_train)
 y_train_pred = knn.predict(x_train)
 y_test_pred = knn.predict(x_test)

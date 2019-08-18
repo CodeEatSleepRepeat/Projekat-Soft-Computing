@@ -16,7 +16,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from keras.callbacks import EarlyStopping
 from keras.models import Sequential
-from colorthief import ColorThief
 from imutils import face_utils
 from keras.layers import Dense
 from sklearn.svm import SVC

@@ -19,7 +19,6 @@ from keras.models import Sequential
 from keras.layers import Conv1D
 from keras.layers import Flatten
 from keras.layers import Dense
-from colorthief import ColorThief
 from imutils import face_utils
 from sklearn.svm import SVC
 
