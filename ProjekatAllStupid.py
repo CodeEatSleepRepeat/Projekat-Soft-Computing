@@ -25,6 +25,9 @@ def reshape_data(input_data):
     nsamples, nx, ny = input_data.shape
     return input_data.reshape((nsamples, nx*ny))
 
+def average(l): 
+    return sum(l)/len(l)
+
 # Declaration of variables
 image_list = {}
 
@@ -139,5 +142,61 @@ print('\nThe preparation of images lasted ', end_prep_time-start_time)
 print('The SVM classification of images lasted ', end_svm_time-start_svm_time)
 print('The KNN classification of images lasted ', end_knn_time-end_svm_time)
 print('Deep learning classification of images lasted ', end_time-end_knn_time)
+
+
+time_array = []
+avg_array = []
+
+for j in range(1000):
+    for i in range(20):
+        x = x_train[i].reshape(1, -1)
+
+        start_time = datetime.datetime.utcnow()
+        y = svm.predict(x)
+        end_time = datetime.datetime.utcnow()
+
+        time = end_time-start_time
+        time_array.append(time.microseconds)
+        
+    avg_array.append(average(time_array))
+
+print('The classification for SVM lasted in average (ms)', str(average(avg_array)/1000))
+
+time_array = []
+avg_array = []
+
+for j in range(1000):
+    for i in range(20):
+        x = x_train[i].reshape(1, -1)
+
+        start_time = datetime.datetime.utcnow()
+        y = knn.predict(x)
+        end_time = datetime.datetime.utcnow()
+
+        time = end_time-start_time
+        time_array.append(time.microseconds)
+        
+    avg_array.append(average(time_array))
+
+print('The classification for KNN lasted in average (ms)', str(average(avg_array)/1000))
+
+time_array = []
+avg_array = []
+
+for j in range(1000):
+    for i in range(20):
+        x = x_train[i].reshape(1, -1)
+
+        start_time = datetime.datetime.utcnow()
+        y = model.predict(x)
+        end_time = datetime.datetime.utcnow()
+
+        time = end_time-start_time
+        time_array.append(time.microseconds)
+        
+    avg_array.append(average(time_array))
+
+print('The classification for Deep learning lasted in average (ms)', str(average(avg_array)/1000))
+
 
 
