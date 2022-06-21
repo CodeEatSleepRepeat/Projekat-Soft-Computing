@@ -1,4 +1,4 @@
-numpy==1.14.3
+numpy==1.22.0
 colorthief==0.2.1
 dlib==19.16.0
 opencv_python==3.4.4.19
